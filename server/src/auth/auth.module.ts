@@ -10,14 +10,14 @@ import { jwtConstants } from './constants';
 
 @Module({
   imports: [
-    UsersModule,
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1d' },
     }),
+    UsersModule,
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [LocalStrategy, JwtStrategy, AuthService],
   exports: [AuthService],
 })
 export class AuthModule {}

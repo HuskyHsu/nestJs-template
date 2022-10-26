@@ -7,14 +7,21 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ArticleEntity } from './entities/article.entity';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Roles } from 'src/roles/roles.decorator';
+import { Role } from 'src/enums/role.enum';
+import { RolesGuard } from 'src/roles/roles.guard';
 
 @Controller('articles')
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
@@ -32,6 +39,7 @@ export class ArticlesController {
   }
 
   @Get('drafts')
+  @Roles(Role.Admin)
   @ApiOkResponse({ type: ArticleEntity, isArray: true })
   findDrafts() {
     return this.articlesService.findDrafts();
