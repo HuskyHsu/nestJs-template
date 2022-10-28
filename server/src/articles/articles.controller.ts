@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
@@ -19,16 +20,23 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/enums/role.enum';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { CaslAbilityFactory } from 'src/casl/casl-ability.factory';
 
 @Controller('articles')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('articles')
 export class ArticlesController {
-  constructor(private readonly articlesService: ArticlesService) {}
+  constructor(
+    private readonly articlesService: ArticlesService,
+    private caslAbilityFactory: CaslAbilityFactory,
+  ) {}
 
   @Post()
   @ApiCreatedResponse({ type: ArticleEntity })
-  create(@Body() createArticleDto: CreateArticleDto) {
+  create(@Body() createArticleDto: CreateArticleDto, @Request() req) {
+    const { user } = req;
+    const ability = this.caslAbilityFactory.createForUser(user);
+
     return this.articlesService.create(createArticleDto);
   }
 

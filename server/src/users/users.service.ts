@@ -12,6 +12,7 @@ export class UsersService {
       email: 'john@gmail.com',
       password: 'changeme',
       roles: ['admin'],
+      isAdmin: true,
     },
     {
       userId: 2,
@@ -19,6 +20,7 @@ export class UsersService {
       email: 'maria@gmail.com',
       password: 'changeme',
       roles: ['user'],
+      isAdmin: false,
     },
   ];
 
