@@ -16,9 +16,9 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { ArticleEntity } from './entities/article.entity';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Roles } from 'src/roles/roles.decorator';
+import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/enums/role.enum';
-import { RolesGuard } from 'src/roles/roles.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @Controller('articles')
 @UseGuards(JwtAuthGuard, RolesGuard)
