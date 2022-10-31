@@ -22,6 +22,8 @@ export class CaslAbilityFactory {
       createPrismaAbility,
     );
 
+    console.log('user', user);
+
     if (user.isAdmin) {
       can(Action.Manage, 'Article');
     } else {

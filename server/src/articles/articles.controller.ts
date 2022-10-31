@@ -22,17 +22,19 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { ArticleEntity } from './entities/article.entity';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'src/enums/role.enum';
-import { RolesGuard } from 'src/auth/roles.guard';
 
 import { PoliciesGuard } from 'src/casl/policies/policies.guard';
 import { CheckPolicies } from 'src/casl/policies/policies.decorator';
-import { ReadArticlePolicyHandler } from 'src/casl/policies/articles';
+import {
+  DeleteArticlePolicyHandler,
+  ManageArticlePolicyHandler,
+  ReadArticlePolicyHandler,
+  UpdateArticlePolicyHandler,
+} from 'src/casl/policies/articles';
 
 @Controller('articles')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard, PoliciesGuard)
+@UseGuards(JwtAuthGuard, PoliciesGuard)
 @ApiTags('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
@@ -53,19 +55,21 @@ export class ArticlesController {
   }
 
   @Get('drafts')
-  @Roles(Role.Admin)
+  @CheckPolicies(new ManageArticlePolicyHandler())
   @ApiOkResponse({ type: ArticleEntity, isArray: true })
   findDrafts() {
     return this.articlesService.findDrafts();
   }
 
   @Get(':id')
+  @CheckPolicies(new ManageArticlePolicyHandler())
   @ApiOkResponse({ type: ArticleEntity })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.articlesService.findOne(+id);
   }
 
   @Patch(':id')
+  @CheckPolicies(new UpdateArticlePolicyHandler())
   @ApiOkResponse({ type: ArticleEntity })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -75,6 +79,7 @@ export class ArticlesController {
   }
 
   @Delete(':id')
+  @CheckPolicies(new DeleteArticlePolicyHandler())
   @ApiOkResponse({ type: ArticleEntity })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.articlesService.remove(+id);
