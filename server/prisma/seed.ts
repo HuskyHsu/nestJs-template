@@ -6,6 +6,29 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
+  // create a new user
+  const user1 = await prisma.user.upsert({
+    where: { email: 'john@gmail.com' },
+    update: {},
+    create: {
+      username: 'john',
+      email: 'john@gmail.com',
+      password: 'changeme',
+      isAdmin: true,
+    },
+  });
+
+  const user2 = await prisma.user.upsert({
+    where: { email: 'maria@gmail.com' },
+    update: {},
+    create: {
+      username: 'maria',
+      email: 'maria@gmail.com',
+      password: 'changeme',
+      isAdmin: false,
+    },
+  });
+
   // create two dummy articles
   const post1 = await prisma.article.upsert({
     where: { title: 'Prisma Adds Support for MongoDB' },
@@ -16,6 +39,7 @@ async function main() {
       description:
         "We are excited to share that today's Prisma ORM release adds stable support for MongoDB!",
       published: false,
+      author: { connect: { id: user1.id } },
     },
   });
 
@@ -28,6 +52,7 @@ async function main() {
       description:
         'Learn about everything in the Prisma ecosystem and community from January to March 2022.',
       published: true,
+      author: { connect: { id: user2.id } },
     },
   });
 

@@ -1,49 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import {
-  Ability,
-  AbilityBuilder,
-  AbilityClass,
-  ExtractSubjectType,
-  InferSubjects,
-} from '@casl/ability';
-
+import { User, Article } from '@prisma/client';
+import { PureAbility, AbilityBuilder, ExtractSubjectType } from '@casl/ability';
+import { createPrismaAbility, PrismaQuery, Subjects } from '@casl/prisma';
 import { Action } from 'src/enums/action.enum';
 
-class User {
-  id: number;
-  isAdmin: boolean;
-}
-
-class Article {
-  id: number;
-  isPublished: boolean;
-  authorId: number;
-}
-
-type Subjects = InferSubjects<typeof Article | typeof User> | 'all';
-
-export type AppAbility = Ability<[Action, Subjects]>;
+export type AppAbility = PureAbility<
+  [
+    string,
+    Subjects<{
+      User: User;
+      Article: Article;
+    }>,
+  ],
+  PrismaQuery
+>;
 
 @Injectable()
 export class CaslAbilityFactory {
   createForUser(user: User) {
-    const { can, cannot, build } = new AbilityBuilder<
-      Ability<[Action, Subjects]>
-    >(Ability as AbilityClass<AppAbility>);
+    const { can, cannot, build } = new AbilityBuilder<AppAbility>(
+      createPrismaAbility,
+    );
 
     if (user.isAdmin) {
-      can(Action.Manage, 'all'); // read-write access to everything
+      can(Action.Manage, 'Article');
     } else {
-      can(Action.Read, 'all'); // read-only access to everything
+      can(Action.Read, 'Article');
     }
 
-    can(Action.Update, Article, { authorId: user.id });
-    cannot(Action.Delete, Article, { isPublished: true });
+    can(Action.Update, 'Article', { authorId: user.id });
+    cannot(Action.Delete, 'Article', { authorId: user.id });
 
     return build({
-      // Read https://casl.js.org/v5/en/guide/subject-type-detection#use-classes-as-subject-types for details
       detectSubjectType: (item) =>
-        item.constructor as ExtractSubjectType<Subjects>,
+        item.constructor as ExtractSubjectType<{
+          User: User;
+          Article: Article;
+        }>,
     });
   }
 }

@@ -7,6 +7,7 @@ export class ArticleEntity implements Article {
   @ApiProperty({ required: false, nullable: true }) description: string | null;
   @ApiProperty() body: string;
   @ApiProperty() published: boolean;
+  @ApiProperty() authorId: number;
   @ApiProperty() createdAt: Date;
   @ApiProperty() updatedAt: Date;
 }

@@ -11,8 +11,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   const config = new DocumentBuilder()
-    .setTitle('Median')
-    .setDescription('The Median API description')
+    .addBearerAuth()
+    .setTitle('NestJs Template')
+    .setDescription('The Template API description')
     .setVersion('1.0')
     .build();
 

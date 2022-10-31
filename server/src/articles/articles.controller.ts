@@ -10,7 +10,12 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
@@ -20,27 +25,28 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/enums/role.enum';
 import { RolesGuard } from 'src/auth/roles.guard';
-import { CaslAbilityFactory } from 'src/casl/casl-ability.factory';
+
+import { PoliciesGuard } from 'src/casl/policies/policies.guard';
+import { CheckPolicies } from 'src/casl/policies/policies.decorator';
+import { ReadArticlePolicyHandler } from 'src/casl/policies/articles';
 
 @Controller('articles')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard, PoliciesGuard)
 @ApiTags('articles')
 export class ArticlesController {
-  constructor(
-    private readonly articlesService: ArticlesService,
-    private caslAbilityFactory: CaslAbilityFactory,
-  ) {}
+  constructor(private readonly articlesService: ArticlesService) {}
 
   @Post()
   @ApiCreatedResponse({ type: ArticleEntity })
   create(@Body() createArticleDto: CreateArticleDto, @Request() req) {
     const { user } = req;
-    const ability = this.caslAbilityFactory.createForUser(user);
-
+    createArticleDto.authorId = user.id;
     return this.articlesService.create(createArticleDto);
   }
 
   @Get()
+  @CheckPolicies(new ReadArticlePolicyHandler())
   @ApiOkResponse({ type: ArticleEntity, isArray: true })
   findAll() {
     return this.articlesService.findAll();

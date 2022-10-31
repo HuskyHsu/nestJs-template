@@ -7,6 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { User } from '@prisma/client';
 
 export class CreateArticleDto {
   @IsString()
@@ -31,4 +32,6 @@ export class CreateArticleDto {
   @IsOptional()
   @ApiProperty({ required: false, default: false })
   published?: boolean = false;
+
+  authorId: User['id'];
 }
