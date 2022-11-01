@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { User, Article } from '@prisma/client';
 import { PureAbility, AbilityBuilder, ExtractSubjectType } from '@casl/ability';
 import { createPrismaAbility, PrismaQuery, Subjects } from '@casl/prisma';
+import { User, Article } from '@prisma/client';
 import { Action } from 'src/enums/action.enum';
 
 export type AppAbility = PureAbility<
@@ -28,10 +28,9 @@ export class CaslAbilityFactory {
       can(Action.Manage, 'Article');
     } else {
       can(Action.Read, 'Article');
+      can(Action.Update, 'Article');
+      cannot(Action.Delete, 'Article');
     }
-
-    can(Action.Update, 'Article', { authorId: user.id });
-    cannot(Action.Delete, 'Article', { authorId: user.id });
 
     return build({
       detectSubjectType: (item) =>

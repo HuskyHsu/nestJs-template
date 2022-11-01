@@ -7,6 +7,7 @@ export class ManageArticlePolicyHandler implements IPolicyHandler {
     return ability.can(Action.Manage, 'Article');
   }
 }
+
 export class ReadArticlePolicyHandler implements IPolicyHandler {
   handle(ability: AppAbility) {
     return ability.can(Action.Read, 'Article');
