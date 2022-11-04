@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { jwtConstants } from './constants';
+import { BcryptService } from 'src/common/utils/bcrypt.service';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { jwtConstants } from './constants';
     }),
     UsersModule,
   ],
-  providers: [LocalStrategy, JwtStrategy, AuthService],
+  providers: [LocalStrategy, JwtStrategy, AuthService, BcryptService],
   exports: [AuthService],
 })
 export class AuthModule {}
